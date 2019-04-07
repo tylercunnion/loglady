@@ -5,19 +5,21 @@ import (
 	"fmt"
 	"io"
 
-	"local/logparse/pkg/formatter"
-	"local/logparse/pkg/parser"
+	"github.com/tylercunnion/loglady/pkg/parser"
 )
 
-func Scan(r io.Reader) error {
+type formatter interface {
+	Format(map[string]interface{}) (string, error)
+}
+
+func Scan(r io.Reader, f formatter) error {
 	var s = bufio.NewScanner(r)
 	var p = &parser.Parser{}
-	var f = &formatter.Formatter{}
 
 	for s.Scan() {
 		var obj, err = p.Parse(s.Bytes())
 		if err != nil {
-			fmt.Println(s.Text())
+			fmt.Printf(">> %s\n", s.Text())
 			continue
 		}
 

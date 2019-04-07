@@ -3,11 +3,14 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"local/logparse/pkg/scanner"
 	"os"
+
+	"github.com/tylercunnion/loglady/pkg/formatter"
+	"github.com/tylercunnion/loglady/pkg/scanner"
 )
 
 func main() {
-	scanner.Scan(bufio.NewReader(os.Stdin))
+	var logFmt = &formatter.Formatter{}
+	scanner.Scan(bufio.NewReader(os.Stdin), logFmt)
 	fmt.Println("done")
 }
