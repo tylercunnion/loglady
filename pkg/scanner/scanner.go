@@ -19,11 +19,13 @@ func Scan(r io.Reader, f formatter) error {
 	for s.Scan() {
 		var obj, err = p.Parse(s.Bytes())
 		if err != nil {
-			fmt.Printf(">> %s\n", s.Text())
-			continue
+			return err
 		}
 
 		str, err := f.Format(obj)
+		if err != nil {
+			return err
+		}
 		fmt.Println(str)
 	}
 
