@@ -1,9 +1,7 @@
 package loglady
 
 import (
-	"bufio"
-	"fmt"
-	"os"
+	"io"
 
 	"github.com/tylercunnion/loglady/pkg/formatter"
 	"github.com/tylercunnion/loglady/pkg/scanner"
@@ -33,13 +31,15 @@ fields:
     format: "%s"
 `
 
-func Run() {
+func Run(r io.Reader) error {
 	var logFmt, err = formatter.GetFormatter([]byte(data))
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
-	err = scanner.Scan(bufio.NewReader(os.Stdin), logFmt)
+	var scanner = scanner.NewScanner(r, logFmt)
+	err = scanner.Scan()
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
+	return nil
 }

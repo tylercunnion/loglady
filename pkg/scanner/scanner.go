@@ -12,7 +12,23 @@ type formatter interface {
 	Format(map[string]interface{}) (string, error)
 }
 
-func Scan(r io.Reader, f formatter) error {
+type Scanner struct {
+	r io.Reader
+	f formatter
+}
+
+func NewScanner(r io.Reader, f formatter) *Scanner {
+	return &Scanner{
+		r: r,
+		f: f,
+	}
+}
+
+func (s *Scanner) Scan() error {
+	return scan(s.r, s.f)
+}
+
+func scan(r io.Reader, f formatter) error {
 	var s = bufio.NewScanner(r)
 	var p = &parser.Parser{}
 
