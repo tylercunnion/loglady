@@ -48,7 +48,7 @@ const (
 func GetFormatter(config []byte) (*Formatter, error) {
 	var f = &Formatter{}
 	var err = yaml.Unmarshal(config, f)
-	fmt.Printf("%v\n", f)
+	//fmt.Printf("%v\n", f)
 
 	if f.Timestamp != nil {
 		if f.Timestamp.Field == "" || f.Timestamp.Parse == "" {
