@@ -33,6 +33,9 @@ func (s *Scanner) Scan() bool {
 	return true
 }
 func (s *Scanner) Err() error {
+	if s.err == io.EOF {
+		return nil
+	}
 	return s.err
 }
 
