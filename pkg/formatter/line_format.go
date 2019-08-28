@@ -4,14 +4,17 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/logrusorgru/aurora"
 	"github.com/tylercunnion/loglady/pkg/values"
+
 	"gopkg.in/yaml.v2"
 )
 
-type formatPair struct {
+type fieldDef struct {
 	Key    string `yaml:"key"`
 	Format string `yaml:"format"`
 	Type   string `yaml:"type"`
+	Color  string `yaml:"color"`
 }
 
 type displayPair struct {
@@ -20,9 +23,10 @@ type displayPair struct {
 }
 
 type LineFormat struct {
-	Fields     []formatPair `yaml:"fields"`
-	LevelNames levelNames   `yaml:"levels"`
-	Timestamp  *tsConfig    `yaml:"timestamp,omitempty"`
+	Fields     []fieldDef `yaml:"fields"`
+	LevelNames levelNames `yaml:"levels"`
+	Timestamp  *tsConfig  `yaml:"timestamp,omitempty"`
+	au         aurora.Aurora
 }
 
 func GetLineFormat(config []byte) (*LineFormat, error) {
@@ -34,6 +38,7 @@ func GetLineFormat(config []byte) (*LineFormat, error) {
 		}
 	}
 	f.LevelNames = mergeDefaults(f.LevelNames)
+	f.au = aurora.NewAurora(true)
 
 	return f, err
 }
@@ -43,19 +48,26 @@ func (f *LineFormat) FormatLine(line map[string]interface{}) (string, error) {
 	var lineLevel logLevel
 
 	for _, fp := range f.Fields {
+		var err error
+		var rawValue = values.Get(line, fp.Key)
+		var color = colorValue(fp.Color)
+		var displayValue interface{}
+
 		switch fp.Type {
 		case "timestamp":
-			val, err := TimestampFormat(values.Get(line, fp.Key).(string), *f.Timestamp)
+			displayValue, err = TimestampFormat(rawValue.(string), *f.Timestamp)
 			if err != nil {
 				return "", err
 			}
-			displays = append(displays, displayPair{val, fp.Format})
 		case "level":
 			lineLevel = getLevel(values.Get(line, fp.Key).(string), f.LevelNames)
 			fallthrough
 		default:
-			displays = append(displays, displayPair{values.Get(line, fp.Key), fp.Format})
+			displayValue = rawValue
 		}
+
+		displayValue = f.au.Colorize(rawValue, color)
+		displays = append(displays, displayPair{displayValue, fp.Format})
 	}
 
 	return buildOutputString(displays, lineLevel), nil
