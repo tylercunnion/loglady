@@ -50,6 +50,10 @@ func (f *LineFormat) FormatLine(line map[string]interface{}) (string, error) {
 	for _, fp := range f.Fields {
 		var err error
 		var rawValue = values.Get(line, fp.Key)
+		if rawValue == nil {
+			continue
+		}
+
 		var color = colorValue(fp.Color)
 		var displayValue interface{}
 
