@@ -9,30 +9,24 @@ import (
 
 var data = `
 timestamp:
-  field: "@timestamp"
   parse: "2006-01-02T15:04:05.999Z07:00"
   format: "Jan _2 15:04:05.0Z"
 levels:
-  info:
-   - INFO
-  warn: 
-   - WARN
   error:
-   - ERROR
    - err
 fields: 
-  - key: "#timestamp"
-    format: "%s "
+  - key: "@timestamp"
+    type: timestamp
   - key: level
-    format: "[%s] "
+    format: "[%s]"
+    type: level
   - key: mdc.application
-    format: "(%s) "
+    format: "(%s)"
   - key: message
-    format: "%s"
 `
 
 func Run(r io.Reader) error {
-	var logFmt, err = formatter.GetFormatter([]byte(data))
+	var logFmt, err = formatter.GetLineFormat([]byte(data))
 	if err != nil {
 		return err
 	}

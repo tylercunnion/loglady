@@ -10,5 +10,8 @@ import (
 
 func main() {
 	fmt.Println("my log has a message for you...")
-	loglady.Run(bufio.NewReader(os.Stdin))
+	err := loglady.Run(bufio.NewReader(os.Stdin))
+	if err != nil {
+		os.Stderr.WriteString(err.Error())
+	}
 }

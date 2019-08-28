@@ -8,16 +8,16 @@ import (
 	"github.com/tylercunnion/loglady/pkg/parser"
 )
 
-type formatter interface {
-	Format(map[string]interface{}) (string, error)
+type lineFormatter interface {
+	FormatLine(map[string]interface{}) (string, error)
 }
 
 type Scanner struct {
 	r io.Reader
-	f formatter
+	f lineFormatter
 }
 
-func NewScanner(r io.Reader, f formatter) *Scanner {
+func NewScanner(r io.Reader, f lineFormatter) *Scanner {
 	return &Scanner{
 		r: r,
 		f: f,
@@ -28,7 +28,7 @@ func (s *Scanner) Scan() error {
 	return scan(s.r, s.f)
 }
 
-func scan(r io.Reader, f formatter) error {
+func scan(r io.Reader, f lineFormatter) error {
 	var s = bufio.NewScanner(r)
 	var p = &parser.Parser{}
 
@@ -38,7 +38,7 @@ func scan(r io.Reader, f formatter) error {
 			return err
 		}
 
-		str, err := f.Format(obj)
+		str, err := f.FormatLine(obj)
 		if err != nil {
 			return err
 		}
