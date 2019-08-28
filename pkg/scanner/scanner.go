@@ -2,7 +2,6 @@ package scanner
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 
 	"github.com/tylercunnion/loglady/pkg/parser"
@@ -13,37 +12,24 @@ type lineFormatter interface {
 }
 
 type Scanner struct {
-	r io.Reader
-	f lineFormatter
+	scan *bufio.Scanner
+	p    *parser.Parser
 }
 
-func NewScanner(r io.Reader, f lineFormatter) *Scanner {
+func NewScanner(r io.Reader) *Scanner {
 	return &Scanner{
-		r: r,
-		f: f,
+		scan: bufio.NewScanner(r),
+		p:    &parser.Parser{},
 	}
 }
 
-func (s *Scanner) Scan() error {
-	return scan(s.r, s.f)
+func (s *Scanner) Scan() bool {
+	return s.scan.Scan()
+}
+func (s *Scanner) Err() error {
+	return s.scan.Err()
 }
 
-func scan(r io.Reader, f lineFormatter) error {
-	var s = bufio.NewScanner(r)
-	var p = &parser.Parser{}
-
-	for s.Scan() {
-		var obj, err = p.Parse(s.Bytes())
-		if err != nil {
-			return err
-		}
-
-		str, err := f.FormatLine(obj)
-		if err != nil {
-			return err
-		}
-		fmt.Println(str)
-	}
-
-	return s.Err()
+func (s *Scanner) Fields() (map[string]interface{}, error) {
+	return s.p.Parse(s.scan.Bytes())
 }

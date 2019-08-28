@@ -8,7 +8,7 @@ import (
 	"github.com/tylercunnion/loglady/pkg/scanner"
 )
 
-func Run(r io.Reader) error {
+func Run(r io.Reader, w io.Writer) error {
 	data, err := ioutil.ReadFile("loglady.yaml")
 	if err != nil {
 		return err
@@ -19,9 +19,21 @@ func Run(r io.Reader) error {
 		return err
 	}
 
-	var scanner = scanner.NewScanner(r, logFmt)
-	err = scanner.Scan()
-	if err != nil {
+	var scanner = scanner.NewScanner(r)
+	for scanner.Scan() {
+		fields, err := scanner.Fields()
+		if err != nil {
+			return err
+		}
+
+		formattedString, err := logFmt.FormatLine(fields)
+		_, err = w.Write([]byte(formattedString + "\n"))
+		if err != nil {
+			return err
+		}
+	}
+
+	if err = scanner.Err(); err != nil {
 		return err
 	}
 	return nil
