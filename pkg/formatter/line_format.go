@@ -22,6 +22,8 @@ type displayPair struct {
 	display string
 }
 
+// LineFormat describes the fields to include in an output line and how to
+// format them.
 type LineFormat struct {
 	Fields     []fieldDef `yaml:"fields"`
 	LevelNames levelNames `yaml:"levels"`
@@ -29,7 +31,9 @@ type LineFormat struct {
 	au         aurora.Aurora
 }
 
-func GetLineFormat(config []byte) (*LineFormat, error) {
+// NewLineFormat parses the config yaml given by `config`and returns a
+// LineFormat which includes the default level names and format strings.
+func NewLineFormat(config []byte) (*LineFormat, error) {
 	var f = &LineFormat{}
 	var err = yaml.Unmarshal(config, f)
 	for fi, fp := range f.Fields {
@@ -43,6 +47,8 @@ func GetLineFormat(config []byte) (*LineFormat, error) {
 	return f, err
 }
 
+// FormatLine takes a parsed line and returns a formatted string ready for
+// output.
 func (f *LineFormat) FormatLine(line map[string]interface{}) (string, error) {
 	var displays = make([]displayPair, 0)
 	var lineLevel logLevel
@@ -59,7 +65,7 @@ func (f *LineFormat) FormatLine(line map[string]interface{}) (string, error) {
 
 		switch fp.Type {
 		case "timestamp":
-			displayValue, err = TimestampFormat(rawValue.(string), *f.Timestamp)
+			displayValue, err = timestampFormat(rawValue.(string), *f.Timestamp)
 			if err != nil {
 				return "", err
 			}

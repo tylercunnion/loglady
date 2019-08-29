@@ -4,6 +4,9 @@ import (
 	"strings"
 )
 
+// Get returns an item from the given map. Since the map is generated from JSON,
+// and therefore can have arbitrarily nested data structures, you can address
+// these by using dotted notation - "name.last" for instance.
 func Get(obj map[string]interface{}, name string) interface{} {
 	var splitName = strings.SplitN(name, ".", 2)
 	if len(splitName) == 1 {

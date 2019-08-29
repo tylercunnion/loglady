@@ -4,6 +4,7 @@ import "strings"
 
 type logLevel int
 
+// Constants that represent the various logging levels.
 const (
 	DEBUG logLevel = iota
 	INFO

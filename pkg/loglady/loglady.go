@@ -8,13 +8,16 @@ import (
 	"github.com/tylercunnion/loglady/pkg/scanner"
 )
 
+// Run is the main entrypoint for the loglady app, accepting a Reader to get
+// input from and a Writer to send the formatted output to.
 func Run(r io.Reader, w io.Writer) error {
+	// TODO: Customize the config location
 	data, err := ioutil.ReadFile("loglady.yaml")
 	if err != nil {
 		return err
 	}
 
-	logFmt, err := formatter.GetLineFormat(data)
+	logFmt, err := formatter.NewLineFormat(data)
 	if err != nil {
 		return err
 	}

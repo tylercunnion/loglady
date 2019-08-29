@@ -9,7 +9,7 @@ type tsConfig struct {
 	Format string `yaml:"format"`
 }
 
-func TimestampFormat(value string, config tsConfig) (string, error) {
+func timestampFormat(value string, config tsConfig) (string, error) {
 	var parsedTime, err = time.Parse(config.Parse, value)
 	if err != nil {
 		return "", err
