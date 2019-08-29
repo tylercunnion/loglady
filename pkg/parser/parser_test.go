@@ -20,15 +20,13 @@ func (s *ParserSuite) SetUpSuite(c *gc.C) {
 
 func (s *ParserSuite) TestRawParser(c *gc.C) {
 	var logline = "hello world"
-	var results, err = s.p.Parse([]byte(logline))
-	c.Assert(err, gc.IsNil)
+	var results = parseRaw([]byte(logline))
 	c.Check(results["message"], gc.Equals, logline)
 }
 
 func (s *ParserSuite) TestJsonParser(c *gc.C) {
 	var logline = `{"level": "INFO", "message": "hello world", "id": 3}`
-	var results, err = s.p.Parse([]byte(logline))
-	c.Assert(err, gc.IsNil)
+	var results = parseJSON([]byte(logline))
 	c.Check(results["level"], gc.Equals, "INFO")
 	c.Check(results["message"], gc.Equals, "hello world")
 	c.Check(results["id"], gc.Equals, float64(3))

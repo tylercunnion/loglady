@@ -48,6 +48,6 @@ func (s *Scanner) Err() error {
 }
 
 // Fields returns parsed fields from the line read in the last Scan().
-func (s *Scanner) Fields() (map[string]interface{}, error) {
+func (s *Scanner) Fields() (*parser.Obj, error) {
 	return s.p.Parse(s.bytes)
 }

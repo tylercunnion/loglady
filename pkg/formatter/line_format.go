@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/logrusorgru/aurora"
-	"github.com/tylercunnion/loglady/pkg/values"
+	"github.com/tylercunnion/loglady/pkg/parser"
 
 	"gopkg.in/yaml.v2"
 )
@@ -49,13 +49,13 @@ func NewLineFormat(config []byte) (*LineFormat, error) {
 
 // FormatLine takes a parsed line and returns a formatted string ready for
 // output.
-func (f *LineFormat) FormatLine(line map[string]interface{}) (string, error) {
+func (f *LineFormat) FormatLine(line *parser.Obj) (string, error) {
 	var displays = make([]displayPair, 0)
 	var lineLevel logLevel
 
 	for _, fp := range f.Fields {
 		var err error
-		var rawValue = values.Get(line, fp.Key)
+		var rawValue = line.Get(fp.Key)
 		if rawValue == nil {
 			continue
 		}
@@ -70,7 +70,7 @@ func (f *LineFormat) FormatLine(line map[string]interface{}) (string, error) {
 				return "", err
 			}
 		case "level":
-			lineLevel = getLevel(values.Get(line, fp.Key).(string), f.LevelNames)
+			lineLevel = getLevel(line.GetAsString(fp.Key), f.LevelNames)
 			fallthrough
 		default:
 			displayValue = rawValue
